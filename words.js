@@ -43,6 +43,18 @@ Erzieher
 nur Emojis in Beschreibung
 Duckface
 Reisen als Hobby
-
+Alle Bilder gleicher Winkel
+Sehenswürdigkeiten
+Hochzeitsfotos
+Lauffotos
+Umkleidekabine
+Offensichtliche Filter
+Kind ("nicht meins")
+Skateboard
+Wassersport
+komplett nackt
+Gitarre
+Klavier
+Campervan
 
 `;
