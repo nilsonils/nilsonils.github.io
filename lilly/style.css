@@ -1,0 +1,247 @@
+:root {
+    --pixel-size: 4px;
+    --sky-color: #1a1a2e;
+    --sea-color: #16213e;
+    --pier-color: #4a3b32;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+    background-color: #000;
+    font-family: 'Courier New', Courier, monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.scene {
+    width: 393px;
+    /* iPhone 15 logical width */
+    height: 852px;
+    /* iPhone 15 logical height */
+    position: relative;
+    background: linear-gradient(to bottom, var(--sky-color) 60%, var(--sea-color) 60%);
+    overflow: hidden;
+    image-rendering: pixelated;
+    transition: transform 2s ease-in-out;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+    /* Nice shadow */
+    border: 8px solid #333;
+    /* Simple frame */
+    border-radius: 40px;
+    /* Rounded corners */
+}
+
+/* Background Image Layer */
+.bg-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('assets/bgPier.png');
+    background-size: cover;
+    background-position: center bottom;
+    z-index: 0;
+}
+
+/* --- Environment (CSS Fallbacks) --- */
+.moon {
+    width: 60px;
+    height: 60px;
+    background-color: #fff;
+    border-radius: 50%;
+    position: absolute;
+    top: 50px;
+    right: 100px;
+    box-shadow: 0 0 20px #fff;
+    z-index: 1;
+}
+
+.pier {
+    position: absolute;
+    bottom: 100px;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background-color: var(--pier-color);
+    background-image: repeating-linear-gradient(90deg, transparent, transparent 19px, #3a2b22 20px);
+    /* Planks only */
+    z-index: 2;
+}
+
+.pier::after {
+    /* Pillars/Posts support */
+    content: '';
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background-image: repeating-linear-gradient(90deg, var(--pier-color), var(--pier-color) 10px, transparent 10px, transparent 50px);
+}
+
+/* --- Actors & Props --- */
+.actor {
+    position: absolute;
+    bottom: 160px;
+    /* On top of pier (100px bottom + 60px height) */
+    width: 32px;
+    height: 48px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transform: scale(var(--pixel-size));
+    transform-origin: bottom center;
+    transition: left 3s linear, right 4s linear, transform 0.2s;
+    z-index: 5;
+}
+
+/* Woman */
+.woman {
+    left: -100px;
+    background-image: url('assets/woman.svg');
+    /* Fallback color if image fails */
+    background-color: transparent;
+}
+
+/* If image loads, remove background color via JS or just let it be behind */
+
+.woman.walking {
+    animation: bounce 0.4s infinite;
+}
+
+/* Man */
+.man {
+    right: -100px;
+    background-image: url('assets/man.svg');
+    /* Fallback */
+    background-color: transparent;
+}
+
+.man.walking {
+    animation: bounce 0.4s infinite;
+}
+
+.prop {
+    position: absolute;
+    bottom: 160px;
+    transform: scale(var(--pixel-size));
+    transform-origin: bottom center;
+    z-index: 4;
+}
+
+.tulip {
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    background-image: url('assets/tulip.svg');
+    background-color: transparent;
+    /* Fallback */
+    background-size: contain;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    animation: sway 2s infinite ease-in-out;
+}
+
+.tulip:hover {
+    transform: scale(calc(var(--pixel-size) * 1.2));
+}
+
+.heart {
+    position: absolute;
+    left: 50%;
+    bottom: 250px;
+    width: 16px;
+    height: 16px;
+    background-image: url('assets/heart.svg');
+    background-color: transparent;
+    background-size: contain;
+    background-repeat: no-repeat;
+    transform: translateX(-50%) scale(var(--pixel-size));
+    /* Initial scale */
+    opacity: 0;
+    transition: opacity 0.5s, bottom 1s ease-out, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 6;
+}
+
+.heart.visible {
+    transform: translateX(-50%) scale(calc(var(--pixel-size) * 8));
+    /* Big pop! */
+}
+
+.heart::before {
+    /* Only show emoji if image fails? No easy CSS way.
+       We'll rely on the image or the fact that it pops up. */
+    content: '';
+}
+
+/* --- UI --- */
+.instruction {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 24px;
+    text-shadow: 2px 2px 0 #000;
+    animation: blink 1s infinite alternate;
+    pointer-events: none;
+    z-index: 20;
+}
+
+.hidden {
+    display: none;
+}
+
+/* --- Animations --- */
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: scale(var(--pixel-size)) translateY(0);
+    }
+
+    50% {
+        transform: scale(var(--pixel-size)) translateY(-2px);
+    }
+}
+
+@keyframes sway {
+
+    0%,
+    100% {
+        transform: scale(var(--pixel-size)) rotate(-5deg);
+    }
+
+    50% {
+        transform: scale(var(--pixel-size)) rotate(5deg);
+    }
+}
+
+@keyframes blink {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0.5;
+    }
+}
+
+/* Camera Pan */
+.camera-up .scene {
+    transform: translateY(30%);
+}
+
+canvas#fireworks {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
