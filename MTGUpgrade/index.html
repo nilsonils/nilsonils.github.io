@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0c0a12">
+<title>Deck-Schmiede</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c0a12; --surface:#171325; --surface2:#1f1a30; --surface3:#271f3c;
+  --line:rgba(212,175,106,.18); --line-strong:rgba(212,175,106,.34);
+  --gold:#e3c266; --gold-soft:#d4af6a; --gold-dim:#8a7434;
+  --text:#efeafa; --muted:#a79fc0; --muted2:#7d7597;
+  --w:#f4e6b4; --u:#5aa2e6; --b:#9a7fd0; --r:#e0664a; --g:#4fb069;
+  --good:#4fb069; --warn:#e0a94a; --crit:#e0664a;
+  --radius:18px; --shadow:0 18px 48px -20px rgba(0,0,0,.85); --maxw:560px;
+  --disp:'Cinzel',Georgia,serif; --ui:'Manrope',system-ui,-apple-system,Segoe UI,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:
+    radial-gradient(1200px 700px at 50% -10%, rgba(122,86,180,.20), transparent 60%),
+    radial-gradient(900px 600px at 100% 110%, rgba(224,102,74,.10), transparent 55%),
+    radial-gradient(900px 600px at 0% 100%, rgba(90,162,230,.10), transparent 55%),
+    var(--bg);
+  background-attachment:fixed;
+  color:var(--text); font-family:var(--ui); font-size:16px; line-height:1.5;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden; min-height:100dvh;
+}
+button{font-family:inherit;color:inherit;cursor:pointer;border:none;background:none}
+a{color:var(--gold)}
+.app{max-width:var(--maxw);margin:0 auto;padding:0 clamp(16px,4.5vw,26px);
+  padding-top:max(18px,env(safe-area-inset-top));padding-bottom:max(28px,env(safe-area-inset-bottom))}
+.screen{display:none;animation:fade .45s ease both}
+.screen.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+.eyebrow{text-transform:uppercase;letter-spacing:.22em;font-size:11px;font-weight:700;color:var(--gold-soft);opacity:.85}
+h1,h2,h3{font-family:var(--disp);font-weight:600;margin:0;letter-spacing:.02em;text-wrap:balance}
+.hero-title{text-align:center;font-size:clamp(34px,10vw,50px);line-height:1.04;margin:12px 0 0;
+  background:linear-gradient(180deg,#fbf1cf,var(--gold) 60%,#9c7a34);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-sub{text-align:center;color:var(--muted);max-width:40ch;margin:14px auto 0;font-size:15px}
+.anvil{width:92px;height:92px;margin:22px auto 4px;display:block;filter:drop-shadow(0 0 18px rgba(227,194,102,.35))}
+.card{margin-top:18px;background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--line);
+  border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+.card h3{font-size:17px;margin-bottom:10px}
+.tabs{display:flex;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px;margin-bottom:14px}
+.tab{flex:1;padding:10px 8px;border-radius:10px;font-weight:700;font-size:14px;color:var(--muted)}
+.tab.on{background:var(--surface3);color:var(--gold);box-shadow:inset 0 0 0 1px var(--line-strong)}
+textarea,input[type=text],input[type=url],input[type=number],select{
+  width:100%;background:#110d1c;border:1px solid var(--line);border-radius:12px;color:var(--text);
+  font-family:var(--ui);font-size:15px;padding:12px 13px;outline:none}
+textarea{min-height:190px;resize:vertical;font-size:14px;line-height:1.45}
+textarea:focus,input:focus,select:focus{border-color:var(--gold-soft)}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px 20px;border-radius:14px;
+  font-weight:800;font-size:16px;letter-spacing:.02em;
+  background:linear-gradient(180deg,#f0d688,var(--gold) 60%,#c39c44);color:#241a06;
+  box-shadow:0 12px 30px -12px rgba(227,194,102,.6),inset 0 1px 0 rgba(255,255,255,.4);transition:transform .12s}
+.btn:active{transform:translateY(1px) scale(.995)}
+.btn:disabled{opacity:.5}
+.btn.ghost{background:var(--surface2);color:var(--text);border:1px solid var(--line-strong);box-shadow:none;font-weight:700}
+.btn.sm{width:auto;padding:10px 15px;font-size:14px;border-radius:12px}
+.row{display:flex;gap:10px;align-items:center}
+.mt{margin-top:12px}.mt2{margin-top:20px}
+.note{color:var(--muted2);font-size:12.5px}
+.muted{color:var(--muted)}
+.help{margin-top:12px;padding:14px;border-radius:14px;background:rgba(224,169,74,.08);border:1px solid rgba(224,169,74,.3);font-size:14px;color:var(--text)}
+.help ol{margin:8px 0 0;padding-left:20px;color:var(--muted)}
+.help li{margin:4px 0}
+.err{color:#ff9d86;font-size:14px;margin-top:10px}
+.topbar{display:flex;align-items:center;gap:12px;padding:6px 0 4px}
+.icon-btn{width:40px;height:40px;flex:none;border-radius:12px;background:var(--surface2);border:1px solid var(--line);
+  display:grid;place-items:center;color:var(--muted);font-size:20px}
+.topbar h2{font-size:20px;flex:1}
+/* commander header */
+.cmdr{display:flex;gap:14px;align-items:center}
+.cmdr img{width:74px;border-radius:8px;box-shadow:0 8px 20px -8px #000}
+.cmdr .nm{font-family:var(--disp);font-size:19px;line-height:1.15}
+.pips{display:flex;gap:5px;margin-top:6px}
+.pip{width:16px;height:16px;border-radius:50%;box-shadow:inset 0 -3px 5px rgba(0,0,0,.35),inset 0 2px 3px rgba(255,255,255,.4)}
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.stat b{display:block;font-family:var(--disp);font-size:19px;color:var(--gold)}
+.stat span{font-size:11.5px;color:var(--muted)}
+.roles{display:grid;gap:9px}
+.role{display:grid;grid-template-columns:105px 1fr 48px;gap:10px;align-items:center;font-size:13.5px}
+.bar{height:8px;border-radius:6px;background:var(--surface3);overflow:hidden;position:relative}
+.bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--gold-dim),var(--gold))}
+.bar.low i{background:linear-gradient(90deg,#8a4a2a,var(--warn))}
+.role .v{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.role .v.low{color:var(--warn);font-weight:700}
+/* settings */
+.field{margin-top:16px}
+.field label{display:flex;justify-content:space-between;font-weight:700;font-size:14px;margin-bottom:8px}
+.field label output{color:var(--gold);font-family:var(--disp)}
+input[type=range]{width:100%;accent-color:var(--gold)}
+.seg{display:flex;gap:6px}
+.seg button{flex:1;padding:11px 8px;border-radius:12px;background:var(--surface);border:1px solid var(--line);font-weight:700;font-size:13.5px;color:var(--muted)}
+.seg button.on{border-color:var(--gold-soft);color:var(--gold);background:linear-gradient(180deg,rgba(227,194,102,.12),var(--surface2))}
+.toggle{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid var(--line);font-size:14px}
+.toggle:first-child{border-top:none}
+.sw{width:46px;height:27px;border-radius:20px;background:var(--surface3);border:1px solid var(--line-strong);position:relative;flex:none;transition:.2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;background:var(--muted);transition:.2s}
+.sw.on{background:rgba(227,194,102,.3)}
+.sw.on::after{left:22px;background:var(--gold)}
+/* deck list */
+details summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;font-weight:700}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"▾";color:var(--gold)}
+details[open] summary::after{content:"▴"}
+.decklist{margin-top:12px;display:grid;gap:4px;max-height:420px;overflow:auto;padding-right:4px}
+.dl{display:flex;align-items:center;gap:10px;padding:7px 9px;border-radius:10px;background:var(--surface);font-size:13.5px}
+.dl .n{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dl .p{color:var(--muted2);font-size:12px;font-variant-numeric:tabular-nums}
+.dl .lk{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-size:15px;opacity:.35;flex:none}
+.dl.locked{background:rgba(227,194,102,.08);box-shadow:inset 0 0 0 1px var(--line-strong)}
+.dl.locked .lk{opacity:1}
+.tag{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:6px;background:var(--surface3);color:var(--muted)}
+/* results */
+.sum{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+.sum .big{font-family:var(--disp);font-size:30px;color:var(--gold);line-height:1}
+.budgetbar{height:8px;border-radius:6px;background:var(--surface3);overflow:hidden;margin-top:12px}
+.budgetbar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:6px;transition:width .4s}
+.swap{margin-top:14px;background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--line);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);animation:fade .4s ease both}
+.swap-cards{display:grid;grid-template-columns:1fr 34px 1fr;align-items:center;gap:6px}
+.sc{text-align:center;min-width:0}
+.sc img{width:100%;max-width:170px;border-radius:9px;display:block;margin:0 auto;box-shadow:0 10px 24px -10px #000;background:var(--surface3);aspect-ratio:488/680;object-fit:cover}
+.sc.out img{filter:grayscale(.65) brightness(.7)}
+.sc .lbl{font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px}
+.sc.out .lbl{color:var(--crit)} .sc.in .lbl{color:var(--good)}
+.sc .cn{font-size:13px;font-weight:700;margin-top:7px;line-height:1.25}
+.sc .cp{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.arrow{font-size:22px;color:var(--gold);text-align:center}
+.why{margin-top:12px;display:grid;gap:5px;font-size:13px;color:var(--muted)}
+.why div{display:flex;gap:8px}
+.why .ic{flex:none;width:18px;text-align:center}
+.swap-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.swap-actions .btn{flex:1;min-width:120px}
+.pill{display:inline-block;font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px;background:rgba(79,176,105,.15);color:#8fe0a6;margin-left:6px;vertical-align:middle}
+.empty{text-align:center;color:var(--muted);padding:26px 10px}
+.sticky-foot{position:sticky;bottom:0;padding:14px 0 4px;background:linear-gradient(0deg,var(--bg) 60%,transparent);margin-top:14px}
+.sticky-foot .row .btn{font-size:14.5px;padding:14px 10px}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(30px);opacity:0;background:var(--surface3);border:1px solid var(--line-strong);
+  padding:11px 18px;border-radius:12px;font-size:14px;font-weight:700;transition:.3s;z-index:60;pointer-events:none;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%)}
+/* loader */
+#loader{position:fixed;inset:0;z-index:50;display:none;place-items:center;background:rgba(12,10,18,.88);backdrop-filter:blur(6px)}
+#loader.on{display:grid}
+.spin{width:84px;height:84px;margin:0 auto;border-radius:50%;border:2px solid var(--line);border-top-color:var(--gold);animation:sp 1s linear infinite;box-shadow:0 0 30px rgba(227,194,102,.2)}
+@keyframes sp{to{transform:rotate(360deg)}}
+#loadText{margin-top:20px;text-align:center;color:var(--muted);font-size:14px;letter-spacing:.04em;max-width:280px}
+.foot{text-align:center;color:var(--muted2);font-size:11.5px;margin-top:26px}
+</style>
+</head>
+<body>
+<div id="loader"><div><div class="spin"></div><div id="loadText">Die Schmiede heizt an …</div></div></div>
+<div class="toast" id="toast"></div>
+
+<div class="app">
+<!-- ================= IMPORT ================= -->
+<section id="s-import" class="screen active">
+  <svg class="anvil" viewBox="0 0 100 100" aria-hidden="true">
+    <defs><linearGradient id="gg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbf1cf"/><stop offset=".6" stop-color="#e3c266"/><stop offset="1" stop-color="#8a6a28"/></linearGradient></defs>
+    <path d="M14 38h58c0 8 6 12 16 12v6c-10 0-16 3-18 10H34c-2-7-8-11-20-12z" fill="url(#gg)"/>
+    <path d="M38 66h28l6 14H32z" fill="url(#gg)" opacity=".85"/>
+    <rect x="26" y="80" width="52" height="7" rx="2" fill="url(#gg)"/>
+    <g fill="#e3c266"><circle cx="50" cy="20" r="2.2"/><circle cx="38" cy="26" r="1.5"/><circle cx="62" cy="24" r="1.7"/><circle cx="56" cy="12" r="1.2"/><circle cx="44" cy="14" r="1.1"/></g>
+  </svg>
+  <div class="eyebrow" style="text-align:center">Commander · Budget-Upgrades</div>
+  <h1 class="hero-title">Deck-Schmiede</h1>
+  <p class="hero-sub">Füge deine Deckliste ein, leg ein Budget fest – die Schmiede schlägt dir die besten Tauschpaare vor. Mit Euro-Preisen und ohne deine Lieblingskarten anzutasten.</p>
+
+  <div class="card">
+    <div class="tabs" role="tablist">
+      <button class="tab on" data-tab="text">Liste einfügen</button>
+      <button class="tab" data-tab="link">Moxfield-Link</button>
+    </div>
+    <div id="tab-text">
+      <textarea id="deckText" placeholder="Commander&#10;1 Alania, Divergent Storm&#10;&#10;Deck&#10;1 Sol Ring&#10;1 Arcane Signet&#10;1 Brainstorm&#10;30 Island&#10;…" spellcheck="false"></textarea>
+      <p class="note mt">Funktioniert mit Exporten aus Moxfield, Archidekt, ManaBox & Co. Format: „1 Kartenname“ pro Zeile. Englische Kartennamen.</p>
+    </div>
+    <div id="tab-link" hidden>
+      <input type="url" id="deckLink" placeholder="https://moxfield.com/decks/…" autocomplete="off">
+      <div class="mt"><button class="btn ghost" id="linkBtn">Deck laden</button></div>
+      <div id="linkHelp"></div>
+    </div>
+    <div class="mt2"><button class="btn" id="analyzeBtn">Deck analysieren ✦</button></div>
+    <div class="err" id="importErr"></div>
+  </div>
+  <p class="foot">Nur für den privaten Gebrauch · Daten von EDHREC &amp; Scryfall · Preise = Cardmarket-Trend</p>
+</section>
+
+<!-- ================= ANALYSE ================= -->
+<section id="s-analyse" class="screen">
+  <div class="topbar"><button class="icon-btn" data-go="s-import" aria-label="Zurück">‹</button><h2>Dein Deck</h2></div>
+
+  <div class="card">
+    <div class="cmdr" id="cmdrBox"></div>
+    <div id="cmdrPick" class="mt" hidden>
+      <select id="cmdrSelect"></select>
+      <p class="note" style="margin-top:6px">Mehrere Legenden gefunden – wähle deinen Commander.</p>
+    </div>
+    <div class="stats" id="stats"></div>
+  </div>
+
+  <div class="card">
+    <h3>Deck-Gerüst</h3>
+    <div class="roles" id="roles"></div>
+    <p class="note mt">Richtwerte für Commander. Lücken werden bei den Vorschlägen bevorzugt gefüllt.</p>
+  </div>
+
+  <div class="card">
+    <h3>Dein Budget</h3>
+    <div class="field">
+      <label for="budget">Gesamtbudget <output id="budgetOut">25 €</output></label>
+      <input type="range" id="budget" min="5" max="150" step="5" value="25">
+    </div>
+    <div class="field">
+      <label for="perCard">Max. pro Karte <output id="perCardOut">5 €</output></label>
+      <input type="range" id="perCard" min="0.5" max="30" step="0.5" value="5">
+    </div>
+    <div class="field">
+      <label for="maxSwaps">Anzahl Tausche <output id="maxSwapsOut">8</output></label>
+      <input type="range" id="maxSwaps" min="1" max="20" step="1" value="8">
+    </div>
+    <div class="field">
+      <label>Worauf optimieren?</label>
+      <div class="seg" id="modeSeg">
+        <button data-mode="balanced" class="on">Ausgewogen</button>
+        <button data-mode="synergy">Synergie</button>
+        <button data-mode="staples">Bewährtes</button>
+      </div>
+    </div>
+    <div class="field">
+      <div class="toggle"><span>Game Changer vermeiden<br><span class="note">Hält das Deck im gemütlichen Bracket</span></span><button class="sw on" id="swGC" aria-label="Game Changer vermeiden"></button></div>
+      <div class="toggle"><span>Länder tauschen<br><span class="note">Standardländer gegen gute Nichtstandardländer</span></span><button class="sw on" id="swLands" aria-label="Länder tauschen"></button></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Geschützte Karten 🔒</h3>
+    <p class="note" style="margin-top:-4px">Diese Karten werden nie rausgetauscht. Tippe in der Liste auf das Schloss oder schütze alles mit einem Stichwort.</p>
+    <div class="field">
+      <label for="protectKw">Schützen, wenn Name oder Typ enthält</label>
+      <input type="text" id="protectKw" placeholder="z. B. Otter, Dragon, Dinosaur (Komma = mehrere)">
+    </div>
+    <details class="mt2" id="deckDetails">
+      <summary><span id="deckSummary">Deckliste</span></summary>
+      <div class="decklist" id="decklist"></div>
+    </details>
+  </div>
+
+  <div class="sticky-foot"><button class="btn" id="forgeBtn">Upgrades schmieden ⚒</button></div>
+</section>
+
+<!-- ================= RESULTS ================= -->
+<section id="s-results" class="screen">
+  <div class="topbar"><button class="icon-btn" data-go="s-analyse" aria-label="Zurück">‹</button><h2>Deine Upgrades</h2></div>
+  <div class="card">
+    <div class="sum">
+      <div><div class="eyebrow">Kosten</div><div class="big" id="sumCost">0 €</div></div>
+      <div style="text-align:right"><div class="eyebrow">Tausche</div><div class="big" id="sumCount">0</div></div>
+    </div>
+    <div class="budgetbar"><i id="sumBar" style="width:0"></i></div>
+    <p class="note" style="margin-top:8px" id="sumNote"></p>
+  </div>
+  <div id="swaps"></div>
+  <div class="sticky-foot">
+    <div class="row">
+      <button class="btn ghost" id="copyShop">Einkaufsliste kopieren</button>
+      <button class="btn" id="copyDeck">Neue Liste kopieren</button>
+    </div>
+  </div>
+</section>
+</div>
+
+<script>
+"use strict";
+/* ============ helpers ============ */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const eur = v => v == null ? '–' : v.toLocaleString('de-DE', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €';
+const norm = n => String(n).split(' // ')[0].trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+const store = {
+  get(k, d){ try { const v = localStorage.getItem('ds_'+k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem('ds_'+k, JSON.stringify(v)); } catch(e){} }
+};
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove('show'), 2200); }
+function loading(on, txt){ $('#loader').classList.toggle('on', on); if (txt) $('#loadText').textContent = txt; }
+function go(id){ $$('.screen').forEach(s => s.classList.toggle('active', s.id === id)); window.scrollTo({top:0}); }
+$$('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
+async function copy(text){
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch(e){ const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand('copy'); } catch(_){} ta.remove(); return ok; }
+}
+
+const BASICS = new Set(['plains','island','swamp','mountain','forest','wastes','snow-covered plains','snow-covered island','snow-covered swamp','snow-covered mountain','snow-covered forest']);
+const COLORS = {W:'var(--w)',U:'var(--u)',B:'var(--b)',R:'var(--r)',G:'var(--g)'};
+const ROLES = [
+  {key:'ramp', label:'Ramp', target:10},
+  {key:'draw', label:'Kartenziehen', target:10},
+  {key:'removal', label:'Removal', target:8},
+  {key:'wipe', label:'Board Wipes', target:2},
+  {key:'land', label:'Länder', target:36}
+];
+const ROLE_LABEL = {ramp:'Ramp', draw:'Kartenziehen', removal:'Removal', wipe:'Board Wipe', land:'Land', other:'Strategie'};
+
+/* ============ state ============ */
+const S = {
+  deck: [],            // {name, qty, key, data}
+  commanders: [],      // entries
+  ci: [],
+  edh: null,           // Map key -> {inc, syn, decks}
+  edhDecks: 0,
+  edhOk: false,
+  cands: [],           // candidate card objects
+  locks: new Set(),
+  rejected: new Set(),
+  keptCuts: new Set(),
+  swaps: [],
+  mode: 'balanced'
+};
+
+/* ============ tabs ============ */
+$$('.tab').forEach(t => t.onclick = () => {
+  $$('.tab').forEach(x => x.classList.toggle('on', x === t));
+  $('#tab-text').hidden = t.dataset.tab !== 'text';
+  $('#tab-link').hidden = t.dataset.tab !== 'link';
+});
+$('#deckText').value = store.get('deckText', '');
+$('#deckLink').value = store.get('deckLink', '');
+
+/* ============ link import ============ */
+function parseLink(url){
+  let m = url.match(/moxfield\.com\/decks\/([A-Za-z0-9_-]+)/);
+  if (m) return {site:'moxfield', id:m[1], open:`https://moxfield.com/decks/${m[1]}`};
+  m = url.match(/archidekt\.com\/(?:api\/)?decks\/(\d+)/);
+  if (m) return {site:'archidekt', id:m[1], open:`https://archidekt.com/decks/${m[1]}`};
+  return null;
+}
+async function tryFetchJSON(u){ try { const r = await fetch(u); if (!r.ok) return null; return await r.json(); } catch(e){ return null; } }
+function moxToText(j){
+  const lines = [];
+  const boards = j.boards || {};
+  const get = b => { const x = boards[b] ? boards[b].cards : j[b]; return x ? Object.values(x) : []; };
+  const cm = get('commanders'), mb = get('mainboard');
+  if (cm.length){ lines.push('Commander'); cm.forEach(c => lines.push(`${c.quantity} ${c.card.name}`)); lines.push(''); }
+  lines.push('Deck'); mb.forEach(c => lines.push(`${c.quantity} ${c.card.name}`));
+  return lines.join('\n');
+}
+function archToText(j){
+  const cm = [], mb = [];
+  (j.cards||[]).forEach(c => {
+    const cats = c.categories || []; const n = c.card?.oracleCard?.name || c.card?.name; if (!n) return;
+    if (cats.some(x => /maybe|sideboard/i.test(x))) return;
+    (cats.includes('Commander') ? cm : mb).push(`${c.quantity} ${n}`);
+  });
+  return (cm.length ? 'Commander\n' + cm.join('\n') + '\n\n' : '') + 'Deck\n' + mb.join('\n');
+}
+$('#linkBtn').onclick = async () => {
+  const url = $('#deckLink').value.trim(); const info = parseLink(url);
+  $('#linkHelp').innerHTML = ''; $('#importErr').textContent = '';
+  if (!info){ $('#importErr').textContent = 'Das sieht nicht nach einem Moxfield- oder Archidekt-Link aus.'; return; }
+  store.set('deckLink', url);
+  loading(true, 'Frage ' + (info.site === 'moxfield' ? 'Moxfield' : 'Archidekt') + ' an …');
+  let text = null;
+  if (info.site === 'moxfield'){
+    const j = await tryFetchJSON(`https://api2.moxfield.com/v3/decks/all/${info.id}`) || await tryFetchJSON(`https://api2.moxfield.com/v2/decks/all/${info.id}`);
+    if (j) text = moxToText(j);
+  } else {
+    const j = await tryFetchJSON(`https://archidekt.com/api/decks/${info.id}/`);
+    if (j) text = archToText(j);
+  }
+  loading(false);
+  if (text){ $('#deckText').value = text; $$('.tab')[0].click(); toast('Deck geladen ✓'); return; }
+  const mox = info.site === 'moxfield';
+  $('#linkHelp').innerHTML = `<div class="help"><b>${mox ? 'Moxfield' : 'Archidekt'} lässt keinen direkten Abruf zu.</b> So geht's in 20 Sekunden:
+    <ol>
+      <li>Deck öffnen (Knopf unten).</li>
+      <li>${mox ? '<b>Mehr (…) → Export</b> und dann <b>„Copy for MTGA“</b> oder <b>„Copy Plain Text“</b> antippen.' : '<b>Export</b> → Format „Text“ → <b>Kopieren</b>.'}</li>
+      <li>Zurückkommen, <b>„Liste einfügen“</b> wählen und einfügen.</li>
+    </ol>
+    <div class="row mt"><a class="btn sm" href="${esc(info.open)}" target="_blank" rel="noopener">Deck öffnen ↗</a>
+    <button class="btn ghost sm" id="toText">Zum Einfügen</button></div></div>`;
+  $('#toText').onclick = () => { $$('.tab')[0].click(); $('#deckText').focus(); };
+};
+
+/* ============ parse decklist ============ */
+function parseDeck(text){
+  const out = []; let section = 'deck';
+  for (let raw of text.split(/\r?\n/)){
+    let l = raw.trim();
+    if (/^\/\//.test(l)){ const h = raw.replace(/\//g,'').trim().toLowerCase(); if (/commander/.test(h)) section='commander'; else if (/side|maybe|consider/.test(h)) section='skip'; else section='deck'; continue; }
+    if (!l) continue;
+    const h = l.replace(/[:\s]+$/,'').toLowerCase();
+    if (/^(commander|commanders|kommandeur)(\s*\(\d+\))?$/.test(h)){ section = 'commander'; continue; }
+    if (/^(deck|mainboard|main|companion)(\s*\(\d+\))?$/.test(h)){ section = 'deck'; continue; }
+    if (/^(sideboard|maybeboard|maybe|considering|tokens?)(\s*\(\d+\))?$/.test(h)){ section = 'skip'; continue; }
+    if (section === 'skip') continue;
+    let qty = 1, name = l;
+    const m = l.match(/^(\d+)\s*[xX]?\s+(.+)$/); if (m){ qty = +m[1]; name = m[2]; }
+    name = name.replace(/\s*\^[^^]*\^/g,'').replace(/\s*\[[^\]]*\]/g,'').replace(/\s+\*[A-Z]+\*/g,'')
+               .replace(/\s+\([A-Za-z0-9]{2,6}\)(\s+[\w★-]+)?\s*$/,'').replace(/\s+#.*$/,'').trim();
+    if (!name) continue;
+    const key = norm(name);
+    const ex = out.find(e => e.key === key);
+    if (ex) ex.qty += qty; else out.push({name, qty, key, isCmdr: section === 'commander'});
+  }
+  return out;
+}
+
+/* ============ Scryfall ============ */
+function faceText(c){ return (c.oracle_text || (c.card_faces||[]).map(f => f.oracle_text||'').join('\n')).toLowerCase(); }
+function img(c, size='normal'){ return c.image_uris?.[size] || c.card_faces?.[0]?.image_uris?.[size] || ''; }
+function priceOf(c){
+  const p = c.prices || {};
+  if (p.eur) return +p.eur; if (p.eur_foil) return +p.eur_foil;
+  if (p.usd) return Math.round(+p.usd * 0.9 * 100) / 100; return null;
+}
+function roleOf(c){
+  const t = (c.type_line||'').toLowerCase(), o = faceText(c);
+  if (/\bland\b/.test(t.split('//')[0])) return 'land';
+  if (/(destroy|exile) (all|each) (other )?(nonland )?(creature|permanent|nontoken)|all creatures get -|deals? \d+ damage to each creature|return all (nonland )?(creatures|permanents)/.test(o)) return 'wipe';
+  if (/search your library for (a|up to \w+|two) (basic )?(land|forest|plains|island|swamp|mountain)|add (one mana|\{[wubrgc]\}|two mana|three mana|\w+ mana)|put (a|up to \w+) land cards? from your hand onto the battlefield|treasure token/.test(o) && !/\bland\b/.test(t)) return 'ramp';
+  if (/(destroy|exile) (target|up to \w+ target)|deals? (\d+|x) damage to (any target|target creature|target planeswalker)|counter target|return target (nonland )?(creature|permanent|artifact|enchantment)[^.]*to its owner's hand|target creature gets -\d|fights? (target|another|up to)/.test(o)) return 'removal';
+  if (/draws? (a|two|three|four|x|that many|\w+) cards?|draw cards? equal|investigate|connives?|impulse|exile the top [^.]* you may play/.test(o)) return 'draw';
+  return 'other';
+}
+function bucketOf(c){
+  const t = (c.type_line||'').split('//')[0].toLowerCase();
+  if (t.includes('land')) return 'land'; if (t.includes('creature')) return 'creature';
+  if (t.includes('instant') || t.includes('sorcery')) return 'spell';
+  if (t.includes('planeswalker')) return 'pw'; if (t.includes('artifact')) return 'artifact';
+  if (t.includes('enchantment')) return 'enchantment'; return 'other';
+}
+async function scryCollection(names, label){
+  const res = new Map(); const notFound = [];
+  for (let i = 0; i < names.length; i += 75){
+    loading(true, `${label} (${Math.min(i+75, names.length)}/${names.length}) …`);
+    const ids = names.slice(i, i+75).map(n => ({name: n.split(' // ')[0]}));
+    const r = await fetch('https://api.scryfall.com/cards/collection', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({identifiers: ids})});
+    if (!r.ok) throw new Error('Scryfall antwortet nicht (' + r.status + ')');
+    const j = await r.json();
+    j.data.forEach(c => { res.set(norm(c.name), c); if (c.card_faces) res.set(norm(c.card_faces[0].name), c); });
+    (j.not_found||[]).forEach(n => notFound.push(n.name));
+    await sleep(110);
+  }
+  return {res, notFound};
+}
+async function cheapestPrint(c){
+  if (c._cheapChecked) return; c._cheapChecked = true;
+  try {
+    const q = `!"${c.name.split(' // ')[0]}" -is:digital`;
+    const r = await fetch(`https://api.scryfall.com/cards/search?q=${encodeURIComponent(q)}&unique=prints&order=eur&dir=asc`);
+    if (!r.ok) return; const j = await r.json();
+    const best = j.data.map(x => ({x, p: x.prices?.eur ? +x.prices.eur : null})).filter(o => o.p != null).sort((a,b) => a.p-b.p)[0];
+    if (best && (c._price == null || best.p < c._price)){ c._price = best.p; c._set = best.x.set_name; }
+  } catch(e){}
+  await sleep(100);
+}
+
+/* ============ EDHREC ============ */
+function slugify(n){ return norm(n).replace(/['’,.!?:]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
+async function loadEdhrec(cmdrs){
+  const slugs = cmdrs.map(c => slugify(c.data.name.split(' // ')[0]));
+  const slug = slugs.length > 1 ? slugs.sort().join('-') : slugs[0];
+  const map = new Map(); let decks = 0; let gcs = new Set();
+  for (const suffix of ['', '/budget']){
+    const j = await tryFetchJSON(`https://json.edhrec.com/pages/commanders/${slug}${suffix}.json`);
+    if (!j) continue;
+    decks = Math.max(decks, j.container?.json_dict?.card?.num_decks || 0);
+    for (const l of (j.container?.json_dict?.cardlists || [])){
+      for (const cv of l.cardviews){
+        const k = norm(cv.name); const inc = cv.potential_decks ? cv.num_decks / cv.potential_decks : 0;
+        const prev = map.get(k);
+        if (!prev || inc > prev.inc) map.set(k, {name: cv.name, inc, syn: cv.synergy || 0, decks: cv.num_decks, list: l.tag, budget: suffix === '/budget'});
+        if (l.tag === 'gamechangers') gcs.add(k);
+      }
+    }
+    await sleep(80);
+  }
+  return {map, decks, ok: map.size > 0, slug, gcs};
+}
+async function fallbackCandidates(){
+  const ci = S.ci.join('').toLowerCase() || 'c';
+  const q = `id<=${ci} f:commander -t:basic -is:digital`;
+  const out = [];
+  for (let page = 1; page <= 2; page++){
+    const j = await tryFetchJSON(`https://api.scryfall.com/cards/search?q=${encodeURIComponent(q)}&order=edhrec&page=${page}`);
+    if (!j) break; out.push(...j.data); if (!j.has_more) break; await sleep(110);
+  }
+  return out;
+}
+
+/* ============ scoring ============ */
+function rankScore(c){ const r = c.edhrec_rank; return r ? Math.max(0, 1 - r / 15000) : 0; }
+function score(c){
+  const e = S.edh?.get(norm(c.name));
+  const inc = e ? e.inc : 0, syn = e ? e.syn : 0, rk = rankScore(c);
+  const w = S.mode === 'synergy' ? [55, 90, 10] : S.mode === 'staples' ? [100, 20, 25] : [80, 50, 15];
+  return inc * w[0] + Math.max(-0.3, syn) * w[1] + rk * w[2];
+}
+
+/* ============ analyse ============ */
+$('#analyzeBtn').onclick = async () => {
+  $('#importErr').textContent = '';
+  const text = $('#deckText').value.trim();
+  if (!text){ $('#importErr').textContent = 'Füge zuerst eine Deckliste ein.'; return; }
+  store.set('deckText', text);
+  const parsed = parseDeck(text);
+  if (parsed.length < 10){ $('#importErr').textContent = 'Das ist sehr kurz – ist das die komplette Liste?'; return; }
+  try {
+    const {res, notFound} = await scryCollection(parsed.map(p => p.name), 'Lese dein Deck');
+    S.deck = parsed.map(p => ({...p, data: res.get(p.key) || null})).filter(p => p.data);
+    S.deck.forEach(e => { e.key = norm(e.data.name); e.price = priceOf(e.data); e.role = roleOf(e.data); e.bucket = bucketOf(e.data); });
+    S.notFound = notFound;
+    // commander detection
+    const isLeg = e => /legendary/i.test(e.data.type_line) && (/creature/i.test(e.data.type_line) || /can be your commander/i.test(e.data.oracle_text||''));
+    let cm = S.deck.filter(e => e.isCmdr);
+    const legends = S.deck.filter(isLeg);
+    if (!cm.length){
+      const deckCI = new Set(S.deck.flatMap(e => e.data.color_identity));
+      const full = legends.filter(e => e.data.color_identity.length === deckCI.size);
+      cm = [full[0] || legends[0]].filter(Boolean);
+    }
+    if (!cm.length){ loading(false); $('#importErr').textContent = 'Kein Commander gefunden. Schreib „Commander“ über die Zeile mit deinem Commander.'; return; }
+    S.legends = legends;
+    await setCommanders(cm);
+    loading(false);
+    go('s-analyse');
+    if (notFound.length) toast(`${notFound.length} Karte(n) nicht erkannt: ${notFound.slice(0,3).join(', ')}${notFound.length>3?' …':''}`);
+  } catch(e){
+    loading(false); $('#importErr').textContent = 'Fehler: ' + e.message + '. Prüfe deine Internetverbindung.';
+  }
+};
+
+async function setCommanders(cm){
+  S.commanders = cm;
+  S.ci = [...new Set(cm.flatMap(c => c.data.color_identity))].sort((a,b) => 'WUBRG'.indexOf(a) - 'WUBRG'.indexOf(b));
+  S.cmdrKey = cm.map(c => c.key).join('+');
+  S.locks = new Set(store.get('locks_' + S.cmdrKey, []));
+  $('#protectKw').value = store.get('kw_' + S.cmdrKey, '');
+  S.rejected = new Set(); S.keptCuts = new Set();
+  loading(true, 'Befrage EDHREC …');
+  const edh = await loadEdhrec(cm);
+  S.edh = edh.map; S.edhOk = edh.ok; S.edhDecks = edh.decks; S.gcs = edh.gcs;
+  // candidates
+  let candNames;
+  if (edh.ok){
+    candNames = [...edh.map.values()].map(v => v.name);
+    const deckKeys = new Set(S.deck.map(e => e.key));
+    candNames = candNames.filter(n => !deckKeys.has(norm(n)));
+    const {res} = await scryCollection(candNames, 'Prüfe Kandidaten & Preise');
+    S.cands = [...new Set(res.values())];
+  } else {
+    loading(true, 'Kein EDHREC-Eintrag – suche Alternativen …');
+    S.cands = await fallbackCandidates();
+  }
+  const deckKeys = new Set(S.deck.map(e => e.key));
+  S.cands = S.cands.filter(c => !deckKeys.has(norm(c.name)) && !BASICS.has(norm(c.name)) && c.legalities?.commander === 'legal'
+    && c.color_identity.every(x => S.ci.includes(x)));
+  S.cands.forEach(c => { c._price = priceOf(c); c._role = roleOf(c); c._bucket = bucketOf(c); });
+  renderAnalyse();
+}
+
+function renderAnalyse(){
+  const cm = S.commanders;
+  $('#cmdrBox').innerHTML = `<img src="${esc(img(cm[0].data,'small'))}" alt="">
+    <div><div class="eyebrow">Commander</div><div class="nm">${cm.map(c => esc(c.data.name)).join(' &amp; ')}</div>
+    <div class="pips">${S.ci.map(c => `<span class="pip" style="background:${COLORS[c]}"></span>`).join('') || '<span class="note">farblos</span>'}</div>
+    <div class="note" style="margin-top:6px">${S.edhOk ? `EDHREC: ${S.edhDecks.toLocaleString('de-DE')} Decks ausgewertet` : 'Kein EDHREC-Profil – nutze allgemeine Beliebtheit'}</div></div>`;
+  // commander picker
+  const leg = S.legends || [];
+  $('#cmdrPick').hidden = leg.length < 2 || S.deck.some(e => e.isCmdr);
+  $('#cmdrSelect').innerHTML = leg.map(l => `<option value="${esc(l.key)}" ${cm.some(c=>c.key===l.key)?'selected':''}>${esc(l.data.name)}</option>`).join('');
+  $('#cmdrSelect').onchange = async e => { const c = leg.find(l => l.key === e.target.value); await setCommanders([c]); loading(false); };
+  // stats
+  const cards = S.deck.reduce((a,e) => a + e.qty, 0);
+  const value = S.deck.reduce((a,e) => a + (e.price||0) * (BASICS.has(e.key) ? 0 : e.qty), 0);
+  const nonland = S.deck.filter(e => e.bucket !== 'land');
+  const avg = nonland.reduce((a,e) => a + e.data.cmc * e.qty, 0) / Math.max(1, nonland.reduce((a,e)=>a+e.qty,0));
+  $('#stats').innerHTML = `<div class="stat"><b>${cards}</b><span>Karten</span></div>
+    <div class="stat"><b>${Math.round(value)} €</b><span>Deckwert</span></div>
+    <div class="stat"><b>${avg.toFixed(2).replace('.',',')}</b><span>Ø Manawert</span></div>`;
+  // roles
+  const cnt = roleCounts(S.deck);
+  $('#roles').innerHTML = ROLES.map(r => { const v = cnt[r.key]||0; const low = r.key === 'land' ? v < r.target - 2 : v < r.target;
+    return `<div class="role"><span>${r.label}</span><div class="bar ${low?'low':''}"><i style="width:${Math.min(100, v / r.target * 100)}%"></i></div><span class="v ${low?'low':''}">${v}/${r.target}</span></div>`; }).join('');
+  renderDeckList();
+}
+function roleCounts(deck){ const c = {}; deck.forEach(e => { if (S.commanders.some(x => x.key === e.key)) return; c[e.role] = (c[e.role]||0) + e.qty; }); return c; }
+
+function isProtected(e){
+  if (S.locks.has(e.key)) return true;
+  if (S.commanders.some(c => c.key === e.key)) return true;
+  const kws = ($('#protectKw').value || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+  const hay = (e.data.name + ' ' + e.data.type_line).toLowerCase();
+  return kws.some(k => hay.includes(k));
+}
+function renderDeckList(){
+  const sorted = [...S.deck].sort((a,b) => (a.bucket === 'land') - (b.bucket === 'land') || a.data.name.localeCompare(b.data.name));
+  const prot = S.deck.filter(isProtected).length;
+  $('#deckSummary').textContent = `Deckliste · ${prot} geschützt`;
+  $('#decklist').innerHTML = sorted.map(e => {
+    const isC = S.commanders.some(c => c.key === e.key); const p = isProtected(e);
+    return `<div class="dl ${p?'locked':''}" data-k="${esc(e.key)}">
+      <span class="n">${e.qty > 1 ? e.qty + '× ' : ''}${esc(e.data.name)}</span>
+      ${isC ? '<span class="tag">Cmdr</span>' : e.role !== 'other' && e.role !== 'land' ? `<span class="tag">${ROLE_LABEL[e.role]}</span>` : ''}
+      <span class="p">${eur(e.price)}</span>
+      <button class="lk" aria-label="Schützen" ${isC?'disabled':''}>${p?'🔒':'🔓'}</button></div>`;
+  }).join('');
+  $$('#decklist .lk').forEach(b => b.onclick = () => {
+    const k = b.parentElement.dataset.k; S.locks.has(k) ? S.locks.delete(k) : S.locks.add(k);
+    store.set('locks_' + S.cmdrKey, [...S.locks]); renderDeckList();
+  });
+}
+$('#protectKw').oninput = () => { store.set('kw_' + S.cmdrKey, $('#protectKw').value); renderDeckList(); };
+
+/* ============ settings ============ */
+const settings = store.get('settings', {budget:25, perCard:5, maxSwaps:8, mode:'balanced', gc:true, lands:true});
+function bindRange(id, fmt){ const el = $('#'+id); el.value = settings[id]; const upd = () => { settings[id] = +el.value; $('#'+id+'Out').textContent = fmt(+el.value); store.set('settings', settings); }; el.oninput = upd; upd(); }
+bindRange('budget', v => v + ' €');
+bindRange('perCard', v => eur(v));
+bindRange('maxSwaps', v => String(v));
+S.mode = settings.mode;
+$$('#modeSeg button').forEach(b => { b.classList.toggle('on', b.dataset.mode === S.mode); b.onclick = () => { S.mode = settings.mode = b.dataset.mode; $$('#modeSeg button').forEach(x => x.classList.toggle('on', x === b)); store.set('settings', settings); }; });
+function bindSw(id, key){ const el = $('#'+id); el.classList.toggle('on', settings[key]); el.onclick = () => { settings[key] = !settings[key]; el.classList.toggle('on', settings[key]); store.set('settings', settings); }; }
+bindSw('swGC', 'gc'); bindSw('swLands', 'lands');
+
+/* ============ forge ============ */
+function computeSwaps(){
+  const budget = settings.budget, perCard = settings.perCard, maxSwaps = settings.maxSwaps;
+  const deck = S.deck.map(e => ({...e}));
+  const counts = roleCounts(deck.filter(e => !S.commanders.some(c => c.key === e.key)));
+  const targets = Object.fromEntries(ROLES.map(r => [r.key, r.target]));
+  // cut pool
+  const pool = deck.filter(e => e.bucket !== 'land' && !isProtected(e) && !S.keptCuts.has(e.key))
+                   .map(e => ({e, s: score(e.data)}));
+  const basics = deck.filter(e => BASICS.has(e.key) && !S.locks.has(e.key));
+  let basicLeft = basics.reduce((a,e) => a + e.qty, 0);
+  const landsNow = counts.land || 0;
+  // candidates
+  const cands = S.cands.filter(c => c._price != null && c._price <= perCard && !S.rejected.has(norm(c.name))
+      && !(settings.gc && (c.game_changer || S.gcs?.has(norm(c.name)))))
+    .map(c => ({c, s: score(c)}))
+    .map(o => { const gap = targets[o.c._role] && o.c._role !== 'land' && (counts[o.c._role]||0) < targets[o.c._role]; o.gap = gap; o.adj = o.s + (gap ? 14 : 0); return o; })
+    .sort((a,b) => b.adj - a.adj);
+  const swaps = []; let spent = 0; const used = new Set(); let landSwaps = 0;
+  for (const o of cands){
+    if (swaps.length >= maxSwaps) break;
+    if (spent + o.c._price > budget + 1e-9) continue;
+    if (o.c._bucket === 'land'){
+      if (!settings.lands || landSwaps >= 3 || basicLeft <= 0 || o.s < 18) continue;
+      // cut the basic with most copies
+      const b = basics.filter(x => x.qty > 0).sort((a,b) => b.qty - a.qty)[0]; if (!b) continue;
+      b.qty--; basicLeft--; landSwaps++;
+      swaps.push({inn: o.c, out: b, inScore: o.s, outScore: 0, gap: false, land: true}); spent += o.c._price; continue;
+    }
+    let best = null, bestV = Infinity;
+    for (const p of pool){
+      if (used.has(p.e.key)) continue;
+      const r = p.e.role; let v = p.s;
+      if (r !== 'other' && r !== o.c._role && (counts[r]||0) <= (targets[r]||0)) v += 30; // don't cut scarce roles
+      if (p.e.bucket !== o.c._bucket) v += 5;
+      if (r === o.c._role) v -= 3;
+      if (v < bestV){ bestV = v; best = p; }
+    }
+    if (!best || o.adj - bestV < 8) continue;
+    used.add(best.e.key);
+    counts[best.e.role] = (counts[best.e.role]||0) - 1; counts[o.c._role] = (counts[o.c._role]||0) + 1;
+    swaps.push({inn: o.c, out: best.e, inScore: o.s, outScore: best.s, gap: o.gap});
+    spent += o.c._price;
+  }
+  return {swaps, spent, landsNow};
+}
+
+$('#forgeBtn').onclick = forge;
+async function forge(){
+  loading(true, 'Schmiede Upgrades …');
+  // round 1, then refine prices to cheapest printing and recompute
+  for (let round = 0; round < 2; round++){
+    const {swaps} = computeSwaps();
+    const unchecked = swaps.map(s => s.inn).filter(c => !c._cheapChecked);
+    if (!unchecked.length) break;
+    let i = 0; for (const c of unchecked){ loading(true, `Suche günstigste Druckversion (${++i}/${unchecked.length}) …`); await cheapestPrint(c); }
+  }
+  const res = computeSwaps(); S.swaps = res.swaps;
+  loading(false); renderResults(res); go('s-results');
+}
+
+function why(sw){
+  const e = S.edh?.get(norm(sw.inn.name)); const eo = S.edh?.get(sw.out.key);
+  const name = S.commanders[0].data.name.split(',')[0];
+  const lines = [];
+  if (e){
+    lines.push(['📈', `In <b>${Math.round(e.inc*100)} %</b> der ${name}-Decks auf EDHREC`]);
+    if (e.syn > 0.15) lines.push(['✨', `Hohe Synergie mit deinem Commander (+${Math.round(e.syn*100)} %)`]);
+    if (e.budget) lines.push(['💰', 'Taucht in EDHRECs Budget-Listen auf']);
+  } else if (sw.inn.edhrec_rank){
+    lines.push(['📈', `Beliebte Commander-Karte (Rang ${sw.inn.edhrec_rank.toLocaleString('de-DE')} auf EDHREC)`]);
+  }
+  if (sw.gap) lines.push(['🧩', `Füllt eine Lücke: <b>${ROLE_LABEL[sw.inn._role]}</b>`]);
+  if (sw.land) lines.push(['🏔', `Ersetzt ein Standardland – besseres Mana, gleiche Länderzahl`]);
+  else if (eo) lines.push(['📉', `${esc(sw.out.data.name)}: nur in ${Math.round(eo.inc*100)} % der Decks`]);
+  else lines.push(['📉', `${esc(sw.out.data.name)} spielt kaum jemand in diesem Commander`]);
+  return lines.map(([i,t]) => `<div><span class="ic">${i}</span><span>${t}</span></div>`).join('');
+}
+
+function renderResults({swaps, spent}){
+  $('#sumCost').textContent = eur(spent);
+  $('#sumCount').textContent = swaps.length;
+  $('#sumBar').style.width = Math.min(100, spent / settings.budget * 100) + '%';
+  $('#sumNote').textContent = `von ${settings.budget} € Budget · max. ${eur(settings.perCard)} pro Karte · Preise der günstigsten Druckversion (Cardmarket-Trend)`;
+  if (!swaps.length){
+    $('#swaps').innerHTML = `<div class="card empty">Keine sinnvollen Tausche gefunden.<br><span class="note">Erhöhe das Budget oder den Maximalpreis pro Karte – oder dein Deck ist schon richtig gut geschmiedet. ⚒</span></div>`;
+    return;
+  }
+  $('#swaps').innerHTML = swaps.map((sw, i) => `
+    <div class="swap" style="animation-delay:${i*50}ms">
+      <div class="swap-cards">
+        <div class="sc out"><div class="lbl">Raus</div><img loading="lazy" src="${esc(img(sw.out.data))}" alt="${esc(sw.out.data.name)}">
+          <div class="cn">${esc(sw.out.data.name)}</div><div class="cp">${sw.land ? 'Standardland' : ROLE_LABEL[sw.out.role]}</div></div>
+        <div class="arrow">➜</div>
+        <div class="sc in"><div class="lbl">Rein</div><img loading="lazy" src="${esc(img(sw.inn))}" alt="${esc(sw.inn.name)}">
+          <div class="cn">${esc(sw.inn.name)}</div><div class="cp">${eur(sw.inn._price)} · ${ROLE_LABEL[sw.inn._role]}</div></div>
+      </div>
+      <div class="why">${why(sw)}</div>
+      <div class="swap-actions">
+        <a class="btn ghost sm" href="https://www.cardmarket.com/de/Magic/Products/Search?searchString=${encodeURIComponent(sw.inn.name.split(' // ')[0])}" target="_blank" rel="noopener">Cardmarket ↗</a>
+        <button class="btn ghost sm" data-rej="${i}">Andere Karte</button>
+        ${sw.land ? '' : `<button class="btn ghost sm" data-keep="${i}">Raus-Karte behalten 🔒</button>`}
+      </div>
+    </div>`).join('');
+  $$('[data-rej]').forEach(b => b.onclick = () => { S.rejected.add(norm(S.swaps[+b.dataset.rej].inn.name)); reforge(); });
+  $$('[data-keep]').forEach(b => b.onclick = () => { S.keptCuts.add(S.swaps[+b.dataset.keep].out.key); reforge(); });
+}
+async function reforge(){ const y = window.scrollY; await forge(); window.scrollTo({top:y}); }
+
+$('#copyShop').onclick = async () => {
+  if (!S.swaps.length) return;
+  const t = S.swaps.map(s => `1 ${s.inn.name}  (${eur(s.inn._price)})`).join('\n') + `\n\nSumme: ${eur(S.swaps.reduce((a,s)=>a+s.inn._price,0))}`;
+  toast(await copy(t) ? 'Einkaufsliste kopiert ✓' : 'Kopieren nicht möglich');
+};
+$('#copyDeck').onclick = async () => {
+  const deck = S.deck.map(e => ({name: e.data.name, qty: e.qty, key: e.key}));
+  S.swaps.forEach(s => { const d = deck.find(x => x.key === s.out.key); if (d) d.qty--; deck.push({name: s.inn.name, qty: 1, key: norm(s.inn.name)}); });
+  const cmKeys = new Set(S.commanders.map(c => c.key));
+  const lines = ['Commander', ...deck.filter(d => cmKeys.has(d.key)).map(d => `1 ${d.name}`), '', 'Deck',
+    ...deck.filter(d => !cmKeys.has(d.key) && d.qty > 0).map(d => `${d.qty} ${d.name}`)];
+  toast(await copy(lines.join('\n')) ? 'Neue Deckliste kopiert ✓ – in Moxfield einfügen' : 'Kopieren nicht möglich');
+};
+</script>
+</body>
+</html>
